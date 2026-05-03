@@ -1,0 +1,565 @@
+{
+  "name": "Multi-Agent Feedback Analyzer1",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.Feedback }}",
+        "options": {
+          "systemMessage": "Analyze the feedback and return ONLY JSON:\n\n{\n  \"sentiment\": \"positive | neutral | negative\"\n}\n\nRules:\n- Only one word sentiment\n- No confidence\n- No emotion\n- No explanation"
+        }
+      },
+      "id": "dae78686-1dc3-48f3-8afb-1ad567849c76",
+      "name": "Sentiment Analyzer",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        368,
+        384
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "id": "2ddfea01-d199-4c23-8b3b-8399a0823162",
+      "name": "Sentiment Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        448,
+        608
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "pXBj4zIPwAdfMb1A",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "numberInputs": 3,
+        "options": {}
+      },
+      "id": "cda795f9-bed5-4ee6-8f84-d032f0128589",
+      "name": "Combine Analysis",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        944,
+        880
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.Feedback }}",
+        "options": {
+          "systemMessage": "Analyze the feedback and return ONLY JSON:\n\n{\n  \"category\": \"one word (shipping, product, support, etc.)\"\n}"
+        }
+      },
+      "id": "fce6d54c-64e1-4cc7-a05f-60d20d2c1df1",
+      "name": "Category Classifier",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        368,
+        784
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "id": "1e5db029-bd0a-4f0c-a78d-43ca23e9cd98",
+      "name": "Category Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        448,
+        1008
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "pXBj4zIPwAdfMb1A",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.Feedback }}",
+        "options": {
+          "systemMessage": "You are an insights generator.\n\nAnalyze the feedback and return ONLY valid JSON in this format:\n\n{\n  \"insight\": \"short phrase (max 6 words)\",\n  \"priority\": \"high | medium | low\"\n}\n\nRules:\n- Keep insight very short\n- No lists\n- No explanations\n- No extra text"
+        }
+      },
+      "id": "bcd48a1e-90ad-467e-950d-ce6b1e834db3",
+      "name": "Insights Generator",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        368,
+        1296
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "id": "f50b1140-288f-49c4-a163-d1fa2534d521",
+      "name": "Insights Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        448,
+        1520
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "pXBj4zIPwAdfMb1A",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "12MylqwX5v4oRtpP84othXAitDfwfPGe7A5Zu5zZx9BA",
+          "mode": "list",
+          "cachedResultName": " Responses",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/12MylqwX5v4oRtpP84othXAitDfwfPGe7A5Zu5zZx9BA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1414422212,
+          "mode": "list",
+          "cachedResultName": "Form Responses 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/12MylqwX5v4oRtpP84othXAitDfwfPGe7A5Zu5zZx9BA/edit#gid=1414422212"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email  ": "={{ $(\"Google Sheets Trigger\").item.json[\"Email  \"] }}",
+            "Sentiment Analyzer": "={{$json.sentiment}}",
+            "Category Classifier": "={{$json.category}}",
+            "Insights Generator": "={{$json.insight}}",
+            "Priority": "={{ $json.priority }}",
+            "row_number": 0
+          },
+          "matchingColumns": [
+            "Email  "
+          ],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email  ",
+              "displayName": "Email  ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Feedback",
+              "displayName": "Feedback",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Rating",
+              "displayName": "Rating",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Sentiment Analyzer",
+              "displayName": "Sentiment Analyzer",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Category Classifier",
+              "displayName": "Category Classifier",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Insights Generator",
+              "displayName": "Insights Generator",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "1b9509e5-c2c0-4340-82a3-e8cf91e45d7d",
+      "name": "Save to Results Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1168,
+        896
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "j2HBfL2A6QJ5jqbh",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "YOUR PROJECT SETUP - 1. Connect YOUR Google account 2. Select YOUR form responses sheet 3. Customize the AI prompts for YOUR use case 4. Define YOUR own categories 5. Choose where to save YOUR results",
+        "height": 240,
+        "width": 320,
+        "color": 2
+      },
+      "id": "08615f15-68aa-4033-bdfc-8e6f1e7d00f6",
+      "name": "Setup Instructions",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -464,
+        336
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      sentiment: JSON.parse($json.output).sentiment\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        496
+      ],
+      "id": "4c9e6a9a-1326-4bf9-a7c4-fc6255ee3b82",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nreturn items.map(item => {\n  const data = JSON.parse(item.json.output);\n\n  return {\n    json: {\n      insight: data.insight,\n      priority: data.priority\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        1296
+      ],
+      "id": "35e7b11a-db34-448c-88da-83c256b8635f",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nreturn items.map(item => {\n  const data = JSON.parse(item.json.output);\n\n  return {\n    json: {\n      category: data.category\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        896
+      ],
+      "id": "8f6ce526-3b99-4ed9-be42-caef37bc0982",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "12MylqwX5v4oRtpP84othXAitDfwfPGe7A5Zu5zZx9BA",
+          "mode": "list",
+          "cachedResultName": " Responses",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/12MylqwX5v4oRtpP84othXAitDfwfPGe7A5Zu5zZx9BA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1414422212,
+          "mode": "list",
+          "cachedResultName": "Form Responses 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/12MylqwX5v4oRtpP84othXAitDfwfPGe7A5Zu5zZx9BA/edit#gid=1414422212"
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        720
+      ],
+      "id": "3867293d-05f6-4352-a242-f24b19fb193c",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "mMzg61Zj9igYNS5o",
+          "name": "Google Sheets Trigger OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\n// get the LAST row (latest form submission)\nconst latestItem = items[items.length - 1];\n\nreturn [latestItem];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -128,
+        720
+      ],
+      "id": "c2a6d659-6794-4af6-b58d-0e2912bfebf5",
+      "name": "Code in JavaScript3"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Sentiment Analyzer": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sentiment Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Sentiment Analyzer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine Analysis": {
+      "main": [
+        [
+          {
+            "node": "Save to Results Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Category Classifier": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Category Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Category Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insights Generator": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insights Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Insights Generator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Combine Analysis",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Combine Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Combine Analysis",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save to Results Sheet": {
+      "main": [
+        []
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "Sentiment Analyzer",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Category Classifier",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Insights Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "8fe3a4bb-99fd-4c9c-86fd-3604b702e694",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7a9bb7ac4655c2858e5265d88e8dd2e512d826dcc27f103e72c5923d89a3f983"
+  },
+  "id": "afGeE43U5gWVf4hd",
+  "tags": []
+}
